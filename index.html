@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kartu Ulang Tahun untuk Citra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FFF2F6;
+    --coral: #E8578F;
+    --coral-light: #FAD3E2;
+    --gold: #F2A6C4;
+    --plum: #4A2540;
+    --plum-soft: #8A5D7D;
+    --sage: #E8578F;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Quicksand', sans-serif;
+    color: var(--plum);
+    overflow-x: hidden;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  h1, h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .scene {
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .scene.hide {
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+  }
+
+  .envelope-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  .envelope {
+    position: relative;
+    width: 280px;
+    height: 190px;
+    cursor: pointer;
+  }
+
+  .env-body {
+    position: absolute;
+    inset: 0;
+    background: #FFFFFF;
+    border: 1.5px solid var(--coral-light);
+    border-radius: 10px;
+    box-shadow: 0 18px 30px -14px rgba(61, 38, 69, 0.28);
+  }
+
+  .env-triangle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-left: 140px solid transparent;
+    border-right: 140px solid transparent;
+    border-bottom: 95px solid var(--coral-light);
+    opacity: 0.55;
+  }
+
+  .env-flap {
+    position: absolute;
+    top: -1px;
+    left: -1.5px;
+    width: 283px;
+    height: 100px;
+    background: var(--coral);
+    clip-path: polygon(0 0, 100% 0, 50% 78%);
+    border-radius: 10px 10px 0 0;
+    transform-origin: top center;
+    transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+    z-index: 3;
+  }
+
+  .envelope.open .env-flap {
+    transform: rotateX(180deg);
+  }
+
+  .env-seal {
+    position: absolute;
+    top: 58px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 42px;
+    height: 42px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 14px -6px rgba(232, 163, 61, 0.6);
+    z-index: 4;
+    transition: opacity 0.3s ease;
+  }
+
+  .envelope.open .env-seal {
+    opacity: 0;
+  }
+
+  .env-seal svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--cream);
+  }
+
+  .env-label {
+    text-align: center;
+  }
+
+  .env-label .to {
+    font-size: 14px;
+    color: var(--plum-soft);
+    letter-spacing: 0.02em;
+  }
+
+  .env-label .name {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    color: var(--plum);
+    margin-top: 2px;
+  }
+
+  .open-btn {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--cream);
+    background: var(--plum);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+
+  .open-btn:hover {
+    background: var(--coral);
+    transform: translateY(-2px);
+  }
+
+  .open-btn:active {
+    transform: translateY(0) scale(0.97);
+  }
+
+  .card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 36px 28px 30px;
+    box-shadow: 0 24px 50px -20px rgba(61, 38, 69, 0.25);
+    text-align: center;
+    position: relative;
+  }
+
+  .card-eyebrow {
+    font-size: 13px;
+    color: var(--sage);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+
+  .card-title {
+    font-size: 26px;
+    line-height: 1.25;
+    color: var(--plum);
+  }
+
+  .card-title .highlight {
+    color: var(--coral);
+  }
+
+  .date-badge {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--coral);
+    background: var(--coral-light);
+    padding: 5px 14px;
+    border-radius: 30px;
+    letter-spacing: 0.02em;
+  }
+
+  .photo-frame {
+    margin: 24px auto 4px;
+    width: 210px;
+    background: #FFFFFF;
+    padding: 10px 10px 26px;
+    border-radius: 4px;
+    box-shadow: 0 14px 24px -14px rgba(74, 37, 64, 0.35);
+    transform: rotate(-2deg);
+  }
+
+  .photo-frame img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 2px;
+    background: var(--coral-light);
+  }
+
+  .photo-placeholder {
+    display: none;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 2px;
+    background: var(--coral-light);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+    color: var(--plum-soft);
+    padding: 16px;
+    line-height: 1.5;
+  }
+
+  .cake-wrap {
+    margin: 22px auto 10px;
+    width: 190px;
+  }
+
+  .candle-flame {
+    transform-origin: bottom center;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .candle-flame.out {
+    opacity: 0;
+    transform: scale(0.2) translateY(4px);
+  }
+
+  .smoke {
+    opacity: 0;
+    transition: opacity 0.4s ease 0.1s, transform 1.1s ease 0.1s;
+    transform: translateY(0);
+  }
+
+  .smoke.show {
+    opacity: 0.5;
+    transform: translateY(-14px);
+  }
+
+  .blow-btn {
+    margin-top: 14px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--plum);
+    background: var(--cream);
+    border: 1.5px solid var(--coral-light);
+    padding: 10px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .blow-btn:hover {
+    background: var(--coral-light);
+  }
+
+  .blow-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .message {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 1s ease, opacity 0.6s ease 0.1s;
+  }
+
+  .message.show {
+    max-height: 3000px;
+    opacity: 1;
+  }
+
+  .message p {
+    font-size: 15.5px;
+    line-height: 1.75;
+    color: var(--plum-soft);
+    text-align: left;
+    margin: 0 0 16px;
+  }
+
+  .ucapan-container {
+    margin-top: 22px;
+  }
+
+  .signature {
+    margin-top: 18px;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--plum);
+    text-align: right;
+  }
+
+  .signature span {
+    display: block;
+    font-family: 'Quicksand', sans-serif;
+    font-style: normal;
+    font-size: 12px;
+    color: var(--sage);
+    margin-bottom: 2px;
+  }
+
+  #confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 50;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    top: -20px;
+    width: 8px;
+    height: 14px;
+    opacity: 0.9;
+    animation: fall linear forwards;
+  }
+
+  @keyframes fall {
+    to {
+      transform: translateY(110vh) rotate(540deg);
+      opacity: 0.2;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="scene" id="envelopeScene">
+    <div class="envelope-wrap">
+      <div class="envelope" id="envelope">
+        <div class="env-triangle"></div>
+        <div class="env-body"></div>
+        <div class="env-seal">
+          <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9.3C.5 8.2 2.3 5 5.6 5c1.9 0 3.4 1 4.4 2.4C11 6 12.5 5 14.4 5c3.3 0 5.1 3.2 3.6 6.7C19.5 16.4 12 21 12 21z"/></svg>
+        </div>
+        <div class="env-flap"></div>
+      </div>
+      <div class="env-label">
+        <div class="to">Untuk,</div>
+        <div class="name">Citra</div>
+      </div>
+      <button class="open-btn" id="openBtn">Buka kartu</button>
+    </div>
+  </div>
+
+  <div class="scene hide" id="cardScene">
+    <div class="card">
+      <div class="card-eyebrow">Sebuah kartu kecil</div>
+      <h1 class="card-title">Selamat ulang tahun,<br><span class="highlight">Citra!</span></h1>
+      <div class="date-badge">27 Oktober</div>
+
+      <div class="photo-frame">
+        <img src="poto.png" alt="Foto kamu dan Citra"
+             onerror="this.style.display='none'; document.getElementById('photoPlaceholder').style.display='flex';">
+        <div class="photo-placeholder" id="photoPlaceholder">
+          Taruh file foto bernama poto.png di folder yang sama dengan kartu ini
+        </div>
+      </div>
+
+      <div class="cake-wrap">
+        <svg viewBox="0 0 200 160" width="100%">
+          <ellipse cx="100" cy="140" rx="70" ry="10" fill="#F4E6D8"/>
+          <rect x="45" y="95" width="110" height="45" rx="6" fill="#F0796A"/>
+          <rect x="45" y="95" width="110" height="12" rx="6" fill="#FBD2CC"/>
+          <rect x="55" y="65" width="90" height="34" rx="6" fill="#FBD2CC"/>
+          <rect x="55" y="65" width="90" height="10" rx="5" fill="#FFFFFF"/>
+          <g id="candle1">
+            <rect x="72" y="42" width="6" height="24" rx="2" fill="#E8A33D"/>
+            <ellipse class="candle-flame" cx="75" cy="38" rx="4.5" ry="7" fill="#E8A33D"/>
+            <circle class="smoke s1" cx="75" cy="28" r="3" fill="#B7A6C0"/>
+          </g>
+          <g id="candle2">
+            <rect x="97" y="36" width="6" height="30" rx="2" fill="#C94277"/>
+            <ellipse class="candle-flame" cx="100" cy="32" rx="4.5" ry="7" fill="#E8A33D"/>
+            <circle class="smoke s2" cx="100" cy="22" r="3" fill="#B7A6C0"/>
+          </g>
+          <g id="candle3">
+            <rect x="122" y="42" width="6" height="24" rx="2" fill="#F0796A"/>
+            <ellipse class="candle-flame" cx="125" cy="38" rx="4.5" ry="7" fill="#E8A33D"/>
+            <circle class="smoke s3" cx="125" cy="28" r="3" fill="#B7A6C0"/>
+          </g>
+        </svg>
+      </div>
+
+      <button class="blow-btn" id="blowBtn">Tiup lilinnya</button>
+
+      <div class="message" id="message">
+       <div class="ucapan-container">
+    <p>Citra, selamat sweet seventeen!</p>
+
+    <p>
+        Nggak kerasa ya, sekarang kamu udah 17 tahun. Makasih ya udah jadi teman yang selalu bisa diajak cerita apa aja,
+        dari yang penting sampai yang random banget. Seneng banget bisa kenal dan punya teman kayak kamu yang selalu suportif,
+        selalu ada, dan somehow bisa bikin hari-hari jadi lebih ringan.
+    </p>
+
+    <p>
+        Di umur 17 ini, semoga kamu bisa menemukan lebih banyak hal yang bikin kamu bahagia. Semoga semua rencana dan
+        impian kamu bisa berjalan dengan lancar, rezekinya makin banyak, sehat terus, dikelilingi orang-orang baik,
+        dan selalu punya alasan buat tersenyum. Kalau nanti ada hal-hal yang nggak sesuai sama apa yang kamu harapkan,
+        semoga kamu tetap kuat dan percaya kalau semuanya akan baik-baik aja pada waktunya.
+    </p>
+
+    <p>
+        Semoga 17 tahun ini jadi awal dari banyak hal indah dalam hidup kamu. Semoga makin banyak cerita seru,
+        pengalaman baru, dan momen-momen yang nantinya bisa kita kenang bareng. Jangan lupa juga buat selalu jadi diri
+        kamu sendiri, karena kamu yang sekarang pun udah lebih dari cukup.
+    </p>
+
+    <p>
+        Sekali lagi, happy sweet seventeen, Citra!<br>
+        Semoga di umur yang baru ini kamu makin bahagia, makin bersinar, dan semua hal baik datang ke kamu satu per satu.
+        Enjoy your seventeen, you deserve all the happiness!
+    </p>
+</div>
+
+        <div class="signature">
+          <span>Dari,</span>
+          LALA CANTIKKKKKKKKKKKKK!!!!!!!
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="confetti-container"></div>
+
+<script>
+  const envelope = document.getElementById('envelope');
+  const openBtn = document.getElementById('openBtn');
+  const envelopeScene = document.getElementById('envelopeScene');
+  const cardScene = document.getElementById('cardScene');
+  const blowBtn = document.getElementById('blowBtn');
+  const message = document.getElementById('message');
+
+  function openEnvelope() {
+    envelope.classList.add('open');
+    setTimeout(() => {
+      envelopeScene.classList.add('hide');
+      cardScene.classList.remove('hide');
+    }, 550);
+  }
+
+  openBtn.addEventListener('click', openEnvelope);
+  envelope.addEventListener('click', openEnvelope);
+
+  function fireConfetti() {
+    const colors = ['#E8578F', '#F2A6C4', '#C94277', '#8A5D7D', '#FAD3E2'];
+    const container = document.getElementById('confetti-container');
+    for (let i = 0; i < 70; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+      piece.style.animationDelay = (Math.random() * 0.4) + 's';
+      container.appendChild(piece);
+      setTimeout(() => piece.remove(), 4200);
+    }
+  }
+
+  blowBtn.addEventListener('click', () => {
+    blowBtn.disabled = true;
+    document.querySelectorAll('.candle-flame').forEach((f, i) => {
+      setTimeout(() => f.classList.add('out'), i * 160);
+    });
+    document.querySelectorAll('.smoke').forEach((s, i) => {
+      setTimeout(() => s.classList.add('show'), i * 160 + 100);
+    });
+    setTimeout(() => {
+      fireConfetti();
+      message.classList.add('show');
+      blowBtn.style.display = 'none';
+    }, 700);
+  });
+</script>
+
+</body>
+</html>
